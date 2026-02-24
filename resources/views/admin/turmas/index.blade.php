@@ -7,12 +7,29 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen font-sans">
-    <nav class="bg-green-700 text-white p-4 shadow-md">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold">Admin - Turmas</h1>
-            <a href="/dashboard" class="text-green-200 hover:text-white font-medium">Dashboard</a>
+    <header class="bg-green-700 pt-8 pb-4 shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-green-600 rounded-full blur-3xl opacity-20 -mr-32 -mt-32"></div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="bg-white rounded-2xl shadow-xl flex items-center justify-between p-2 md:p-4 border border-white/20">
+                <a href="/dashboard" class="flex items-center gap-4 group">
+                    <div class="bg-gray-50 p-2 rounded-xl group-hover:bg-white transition-colors duration-300">
+                        <img src="{{ asset('images/logo-ifba.png') }}" alt="IFBA Logo" class="h-10 md:h-12 w-auto group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-black text-lg md:text-xl leading-none tracking-tighter uppercase text-green-800">Admin - Turmas</span>
+                        <span class="text-[9px] md:text-[10px] text-green-600 font-bold uppercase tracking-[0.2em] mt-1">{{ \App\Models\Setting::get('campus_name', 'Campus Vitória da Conquista') }}</span>
+                    </div>
+                </a>
+
+                <div class="flex items-center gap-6">
+                    <a href="/dashboard" class="bg-green-50 hover:bg-green-100 text-green-700 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300 shadow-sm">
+                        Voltar ao Dashboard
+                    </a>
+                </div>
+            </div>
         </div>
-    </nav>
+    </header>
 
     <main class="container mx-auto p-6 max-w-5xl">
         <div class="flex justify-between items-center mb-6">
@@ -85,11 +102,17 @@
                                         Turma {{ $turma->nome }}
                                     </td>
                                     <td class="px-6 py-4 text-right">
-                                        <form action="{{ route('admin.turmas.destroy', $turma) }}" method="POST" onsubmit="return confirm('Deseja excluir esta turma?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-400 hover:text-red-600 text-[10px] font-black uppercase tracking-tighter">Excluir</button>
-                                        </form>
+                                        <div class="flex justify-end gap-3">
+                                            <button onclick="openEditModal({{ $turma->id }}, {{ $turma->course_id }}, {{ $turma->serie_id }}, '{{ $turma->nome }}')" 
+                                                class="text-amber-500 hover:text-amber-700 text-[10px] font-black uppercase tracking-tighter">
+                                                Editar
+                                            </button>
+                                            <form action="{{ route('admin.turmas.destroy', $turma) }}" method="POST" onsubmit="return confirm('Deseja excluir esta turma?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-400 hover:text-red-600 text-[10px] font-black uppercase tracking-tighter">Excluir</button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
@@ -103,5 +126,93 @@
             </div>
         </div>
     </main>
-</body>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all duration-300 scale-95 opacity-0" id="editModalContent">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Editar Turma</h3>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <form id="editForm" method="POST" class="p-6">
+                @csrf
+                @method('PUT')
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Curso</label>
+                        <select name="curso_id" id="edit_curso_id" required 
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition-all">
+                            @foreach($courses as $course)
+                                <option value="{{ $course->id }}">{{ $course->nome }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Série</label>
+                        <select name="serie_id" id="edit_serie_id" required 
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition-all">
+                            @foreach($series as $serie)
+                                <option value="{{ $serie->id }}">{{ $serie->nome }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Nome da Turma</label>
+                        <input type="text" name="nome" id="edit_nome" required 
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition-all">
+                    </div>
+                </div>
+                <div class="mt-8 flex gap-3">
+                    <button type="button" onclick="closeEditModal()" 
+                        class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-black py-3 rounded-xl transition-all uppercase text-[10px] tracking-widest">
+                        Cancelar
+                    </button>
+                    <button type="submit" 
+                        class="flex-1 bg-green-600 hover:bg-green-700 text-white font-black py-3 rounded-xl transition-all shadow-lg shadow-green-500/30 uppercase text-[10px] tracking-widest">
+                        Salvar Alterações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openEditModal(id, curso_id, serie_id, nome) {
+            const modal = document.getElementById('editModal');
+            const content = document.getElementById('editModalContent');
+            const form = document.getElementById('editForm');
+            
+            form.action = `/admin/turmas/${id}`;
+            document.getElementById('edit_curso_id').value = curso_id;
+            document.getElementById('edit_serie_id').value = serie_id;
+            document.getElementById('edit_nome').value = nome;
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeEditModal() {
+            const modal = document.getElementById('editModal');
+            const content = document.getElementById('editModalContent');
+            
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target == modal) {
+                closeEditModal();
+            }
+        }
+    </script>
 </html>

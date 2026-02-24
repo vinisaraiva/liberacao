@@ -7,24 +7,40 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col font-sans">
-    <nav class="bg-green-700 p-4 text-white shadow-lg">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="/dashboard" class="font-bold text-xl flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                Controle de Liberação
-            </a>
-            <div class="flex items-center gap-4">
-                <div class="text-right hidden md:block">
-                    <p class="font-semibold">{{ Auth::user()->name }}</p>
-                    <p class="text-xs text-green-200 uppercase tracking-widest">{{ Auth::user()->role }}</p>
+    <header class="bg-green-700 pt-8 pb-4 shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-green-600 rounded-full blur-3xl opacity-20 -mr-32 -mt-32"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-green-800 rounded-full blur-2xl opacity-30 -ml-24 -mb-24"></div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="bg-white rounded-2xl shadow-xl flex items-center justify-between p-2 md:p-4 border border-white/20">
+                <a href="/dashboard" class="flex items-center gap-4 group">
+                    <div class="bg-gray-50 p-2 rounded-xl group-hover:bg-white transition-colors duration-300">
+                        <img src="{{ asset('images/logo-ifba.png') }}" alt="IFBA Logo" class="h-10 md:h-14 w-auto group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-black text-lg md:text-2xl leading-none tracking-tighter uppercase text-green-800">Sistema de Liberação</span>
+                        <span class="text-[9px] md:text-[10px] text-green-600 font-bold uppercase tracking-[0.2em] mt-1">{{ \App\Models\Setting::get('campus_name', 'Campus Vitória da Conquista') }}</span>
+                    </div>
+                </a>
+
+                <div class="flex items-center gap-2 md:gap-6">
+                    <div class="text-right hidden sm:block border-r border-gray-100 pr-6">
+                        <p class="font-black text-gray-800 uppercase text-xs tracking-tight">{{ Auth::user()->name }}</p>
+                        <p class="text-[10px] text-green-600 font-black uppercase tracking-widest mt-0.5">{{ Auth::user()->role }}</p>
+                    </div>
+                    
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="bg-red-50 hover:bg-red-100 text-red-600 p-3 rounded-xl transition-all duration-300 shadow-sm group">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                        </button>
+                    </form>
                 </div>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="bg-green-800 hover:bg-green-900 px-4 py-2 rounded text-sm font-bold transition shadow-sm">Sair</button>
-                </form>
             </div>
         </div>
-    </nav>
+    </header>
 
     <main class="container mx-auto p-6 flex-grow">
         @if(session('success'))
@@ -73,6 +89,13 @@
                     </div>
                     Nova Liberação
                 </a>
+                
+                <a href="{{ route('chaves.create') }}" class="group w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 px-6 rounded-2xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center gap-3">
+                    <div class="bg-white/20 p-2 rounded-lg group-hover:scale-110 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
+                    </div>
+                    Autorizar Chave
+                </a>
 
                 <button onclick="refreshAll()" class="w-full bg-white border-2 border-dashed border-gray-200 hover:border-green-300 hover:bg-green-50 text-gray-500 hover:text-green-600 py-3 rounded-2xl flex items-center justify-center gap-2 transition-all group active:scale-95">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:rotate-180 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
@@ -83,14 +106,26 @@
                     <h3 class="font-black text-gray-800 text-xs uppercase mb-4 tracking-widest text-center border-b pb-2">Menu Rápido</h3>
                     <div class="space-y-1">
                         @if(in_array(Auth::user()->role, ['ADMIN', 'PORTARIA']))
-                        <a href="{{ route('portaria') }}" target="_blank" class="flex items-center gap-3 px-3 py-3 text-sm font-medium text-gray-600 hover:bg-green-50 hover:text-green-700 rounded-xl transition group">
-                            <span class="p-1 bg-gray-100 group-hover:bg-white rounded-md transition">🏠</span>
-                            Painel Portaria (TV)
+                        <a href="{{ route('portaria') }}" target="_blank" class="flex items-center gap-3 px-3 py-3 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 rounded-xl transition group">
+                            <span class="p-1 bg-gray-100 group-hover:bg-white rounded-md transition">🏘️</span>
+                            HUB Portaria (Geral)
                         </a>
+                        <div class="ml-4 pl-4 border-l border-gray-100 space-y-1">
+                            <a href="{{ route('portaria.alunos') }}" target="_blank" class="flex items-center gap-3 px-3 py-2 text-xs font-medium text-gray-500 hover:text-green-600 rounded-lg transition">
+                                <span>👤</span> Liberação de Alunos
+                            </a>
+                            <a href="{{ route('portaria.chaves') }}" target="_blank" class="flex items-center gap-3 px-3 py-2 text-xs font-medium text-gray-500 hover:text-blue-600 rounded-lg transition">
+                                <span>🔑</span> Controle de Chaves
+                            </a>
+                        </div>
                         @endif
                         <a href="{{ route('releases.history') }}" class="flex items-center gap-3 px-3 py-3 text-sm font-medium text-gray-600 hover:bg-green-50 hover:text-green-700 rounded-xl transition group">
                             <span class="p-1 bg-gray-100 group-hover:bg-white rounded-md transition">📜</span>
                             Histórico Geral
+                        </a>
+                        <a href="{{ route('chaves.history') }}" class="flex items-center gap-3 px-3 py-3 text-sm font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition group">
+                            <span class="p-1 bg-gray-100 group-hover:bg-white rounded-md transition">📋</span>
+                            Histórico de Chaves
                         </a>
                         @if(Auth::user()->role === 'ADMIN')
                         <a href="{{ route('admin.terminals.index') }}" class="flex items-center gap-3 px-3 py-3 text-sm font-medium text-gray-600 hover:bg-green-50 hover:text-green-700 rounded-xl transition group">
@@ -100,6 +135,10 @@
                         <a href="{{ route('admin.courses.index') }}" class="flex items-center gap-3 px-3 py-3 text-sm font-medium text-gray-600 hover:bg-green-50 hover:text-green-700 rounded-xl transition group">
                             <span class="p-1 bg-gray-100 group-hover:bg-white rounded-md transition">📚</span>
                             Cursos
+                        </a>
+                        <a href="{{ route('admin.laboratorios.index') }}" class="flex items-center gap-3 px-3 py-3 text-sm font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition group">
+                            <span class="p-1 bg-gray-100 group-hover:bg-white rounded-md transition">🔬</span>
+                            Laboratórios
                         </a>
                         <a href="{{ route('admin.series.index') }}" class="flex items-center gap-3 px-3 py-3 text-sm font-medium text-gray-600 hover:bg-green-50 hover:text-green-700 rounded-xl transition group">
                             <span class="p-1 bg-gray-100 group-hover:bg-white rounded-md transition">🏷️</span>
@@ -112,6 +151,10 @@
                         <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-3 py-3 text-sm font-medium text-gray-600 hover:bg-green-50 hover:text-green-700 rounded-xl transition group">
                             <span class="p-1 bg-gray-100 group-hover:bg-white rounded-md transition">👤</span>
                             Usuários
+                        </a>
+                        <a href="{{ route('admin.settings.index') }}" class="flex items-center gap-3 px-3 py-3 text-sm font-medium text-gray-600 hover:bg-green-50 hover:text-green-700 rounded-xl transition group">
+                            <span class="p-1 bg-gray-100 group-hover:bg-white rounded-md transition">⚙️</span>
+                            Configurações
                         </a>
                         @endif
                         <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 px-3 py-3 text-sm font-medium text-gray-600 hover:bg-green-50 hover:text-green-700 rounded-xl transition group">

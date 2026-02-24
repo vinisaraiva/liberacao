@@ -7,12 +7,29 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
-    <nav class="bg-green-700 text-white p-4 shadow-md">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold">Histórico Geral</h1>
-            <a href="/dashboard" class="text-green-200 hover:text-white">Voltar ao Dashboard</a>
+    <header class="bg-green-700 pt-8 pb-4 shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-green-600 rounded-full blur-3xl opacity-20 -mr-32 -mt-32"></div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="bg-white rounded-2xl shadow-xl flex items-center justify-between p-2 md:p-4 border border-white/20">
+                <a href="/dashboard" class="flex items-center gap-4 group">
+                    <div class="bg-gray-50 p-2 rounded-xl group-hover:bg-white transition-colors duration-300">
+                        <img src="{{ asset('images/logo-ifba.png') }}" alt="IFBA Logo" class="h-10 md:h-12 w-auto group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="flex flex-col text-left">
+                        <span class="font-black text-lg md:text-xl leading-none tracking-tighter uppercase text-green-800">Histórico Geral de Liberações</span>
+                        <span class="text-[9px] md:text-[10px] text-green-600 font-bold uppercase tracking-[0.2em] mt-1">{{ \App\Models\Setting::get('campus_name', 'Campus Vitória da Conquista') }}</span>
+                    </div>
+                </a>
+
+                <div class="flex items-center gap-6">
+                    <a href="/dashboard" class="bg-green-50 hover:bg-green-100 text-green-700 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300 shadow-sm">
+                        Voltar ao Dashboard
+                    </a>
+                </div>
+            </div>
         </div>
-    </nav>
+    </header>
 
     <main class="container mx-auto p-6 max-w-6xl">
         <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">

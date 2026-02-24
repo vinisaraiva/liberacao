@@ -18,8 +18,17 @@ Route::get('/dashboard', function () {
 })->middleware('auth')->name('dashboard');
 
 Route::get('/portaria', function () {
-    return view('portaria');
+    return view('portaria.index');
 })->name('portaria');
+
+Route::get('/portaria/alunos', function () {
+    return view('portaria.alunos');
+})->name('portaria.alunos');
+
+Route::get('/portaria/chaves', [App\Http\Controllers\PortariaChaveController::class , 'index'])->name('portaria.chaves');
+Route::get('/portaria/chaves/dados', [App\Http\Controllers\PortariaChaveController::class , 'getDados'])->middleware('terminal.auth');
+Route::post('/portaria/chaves/autorizacoes/{id}/retirar', [App\Http\Controllers\PortariaChaveController::class , 'retirar'])->middleware('terminal.auth');
+Route::post('/portaria/chaves/autorizacoes/{id}/devolver', [App\Http\Controllers\PortariaChaveController::class , 'devolver'])->middleware('terminal.auth');
 
 Route::middleware('auth')->group(function () {
     Route::get('/api/students/search', [App\Http\Controllers\StudentController::class , 'search']);
@@ -34,6 +43,12 @@ Route::middleware('auth')->group(function () {
         }
         )->name('releases.history');
 
+        // Módulo Chaves (Autorizador)
+        Route::get('/chaves/autorizar', [App\Http\Controllers\AutorizacaoChaveController::class , 'create'])->name('chaves.create');
+        Route::post('/chaves/autorizacoes', [App\Http\Controllers\AutorizacaoChaveController::class , 'store'])->name('chaves.store');
+        Route::post('/chaves/autorizacoes/{id}/cancelar', [App\Http\Controllers\AutorizacaoChaveController::class , 'cancel'])->name('chaves.cancel');
+        Route::get('/chaves/historico', [App\Http\Controllers\AutorizacaoChaveController::class , 'history'])->name('chaves.history');
+
         // Admin Routes
         Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/terminals', [App\Http\Controllers\Admin\TerminalController::class , 'index'])->name('terminals.index');
@@ -47,9 +62,18 @@ Route::middleware('auth')->group(function () {
             Route::resource('turmas', App\Http\Controllers\Admin\TurmaController::class)->except(['create', 'edit', 'show']);
             Route::resource('users', App\Http\Controllers\Admin\UserController::class)->except(['create', 'edit', 'show']);
 
+            // Admin Laboratórios
+            Route::resource('laboratorios', App\Http\Controllers\Admin\LaboratorioController::class)->except(['create', 'edit', 'show']);
+            Route::post('/laboratorios/{laboratorio}/toggle', [App\Http\Controllers\Admin\LaboratorioController::class , 'toggle'])->name('laboratorios.toggle');
+
             Route::get('/reports', [App\Http\Controllers\Admin\ReportController::class , 'index'])->name('reports.index');
             Route::get('/reports/releases', [App\Http\Controllers\Admin\ReportController::class , 'releases'])->name('reports.releases');
             Route::get('/reports/student', [App\Http\Controllers\Admin\ReportController::class , 'student'])->name('reports.student');
+            Route::get('/reports/chaves', [App\Http\Controllers\Admin\ReportController::class , 'chaves'])->name('reports.chaves');
+
+            // Configurações
+            Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class , 'index'])->name('settings.index');
+            Route::post('/settings', [App\Http\Controllers\Admin\SettingController::class , 'update'])->name('settings.update');
         }
         );
     });

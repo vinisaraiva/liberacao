@@ -25,13 +25,11 @@
 <body class="bg-mesh min-h-screen flex items-center justify-center p-4">
     <div class="w-full max-w-md">
         <div class="text-center mb-10">
-            <div class="inline-flex p-4 rounded-3xl bg-white/10 backdrop-blur-xl mb-4 shadow-2xl">
-                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                </svg>
+            <div class="inline-flex transition-transform hover:scale-110 duration-500">
+                <img src="{{ asset('images/logo-ifba.png') }}" alt="IFBA Logo" class="h-32 w-auto">
             </div>
             <h1 class="text-4xl font-extrabold text-white tracking-tight">LiberAção</h1>
-            <p class="text-green-200 mt-2 font-medium">Controle de Saída Escolar</p>
+            <p class="text-green-200 mt-2 font-black uppercase text-[10px] tracking-[0.2em]">{{ \App\Models\Setting::get('campus_name', 'Campus Vitória da Conquista') }}</p>
         </div>
 
         <div class="glass p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
