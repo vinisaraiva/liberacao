@@ -1,0 +1,26 @@
+# Gates de qualidade. O GitHub Actions está desligado nesta conta: quem roda estes passos
+# é o Fiscal do Hermes (fiscal-apps.py), que lê os `run:` deste arquivo no commit do PR.
+# Pré-requisito na VPS: PHP 8.1+ e Composer (ainda não instalados em 02/11/2026).
+name: quality-gates
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Dependências PHP (composer install)
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Testes unitários (PHPUnit, sem banco)
+        run: cp -n .env.example .env && php artisan key:generate && php artisan test --testsuite=Unit
+      - name: Build de assets (vite build)
+        run: npm install && npm run build
